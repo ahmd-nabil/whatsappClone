@@ -33,7 +33,7 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return 3;
     }
 
     @Nullable
@@ -46,6 +46,7 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter {
                 return "Groups";
             case 2:
                 return "Contacts";
+
             default:
                 return null;
         }
