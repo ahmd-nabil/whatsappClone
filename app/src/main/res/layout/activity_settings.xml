@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/set_profile_image"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:src="@drawable/profile_image"
+        app:civ_border_width="0dp"
+        app:civ_border_color="#FEFEFE"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/set_user_name"
+        android:hint="username"
+        android:layout_below="@+id/set_profile_image"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:drawableStart="@drawable/edit_profile"
+        android:background="@drawable/inputs"
+        android:padding="6dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/set_about_me"
+        android:hint="About Me"
+        android:layout_below="@+id/set_user_name"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:drawableStart="@drawable/edit_status"
+        android:background="@drawable/inputs"
+        android:padding="6dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/update_settings_button"
+        android:text="Update"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:background="@drawable/buttons"
+        android:textColor="@android:color/background_light"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_below="@+id/set_about_me"
+        android:padding="6dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        />
+
+</RelativeLayout>

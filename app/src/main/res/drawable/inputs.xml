@@ -4,4 +4,7 @@
         android:color="@color/colorPrimary"
         android:width="4dp"
         ></stroke>
+    <corners
+        android:radius="4dp"
+        ></corners>
 </shape>
