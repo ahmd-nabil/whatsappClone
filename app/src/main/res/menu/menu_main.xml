@@ -8,6 +8,12 @@
         >
     </item>
     <item
+        android:id="@+id/main_create_group"
+        android:title="Create Group"
+        app:showAsAction="never"
+        >
+    </item>
+    <item
         android:id="@+id/main_settings"
         android:title="Settings"
         app:showAsAction="never"
@@ -19,4 +25,5 @@
         app:showAsAction="never"
         >
     </item>
+
 </menu>

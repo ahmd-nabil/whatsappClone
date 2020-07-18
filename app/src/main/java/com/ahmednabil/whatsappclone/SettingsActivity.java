@@ -16,8 +16,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -40,6 +43,8 @@ public class SettingsActivity extends AppCompatActivity {
         rootRef = FirebaseDatabase.getInstance().getReference();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         initializeViews();
+        retrieveUserSettings();
+
         updateSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,6 +61,26 @@ public class SettingsActivity extends AppCompatActivity {
         updateSettingsButton = findViewById(R.id.update_settings_button);
     }
 
+    private void retrieveUserSettings() {
+        settingsUserName.setVisibility(View.INVISIBLE);                     // to prevent updating username (just like whatsapp.)
+        rootRef.child("users").child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){ // if there is user.
+                    if(snapshot.child("username").exists()) {
+                        settingsUserName.setText(snapshot.child("username").getValue().toString());
+                        settingsAboutMe.setText(snapshot.child("aboutMe").getValue().toString());
+                    } else
+                        settingsUserName.setVisibility(View.VISIBLE);     // to make it visible just when it's the first time user log in.
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
     private void updateUserSettings() {
         String username = settingsUserName.getText().toString();
         String aboutMe = settingsAboutMe.getText().toString();
@@ -81,7 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void sendUserToMainActivity() {
-        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+        Intent intent = new Intent(SettingsActivity.this, MainActivity.class); // explicit intent
         startActivity(intent);
     }
 }

@@ -1,15 +1,22 @@
 package com.ahmednabil.whatsappclone;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -50,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(firebaseAuth.getCurrentUser() == null){
+        if(firebaseAuth.getCurrentUser() == null){ // there is not user logged in yet.
             sendUserToLoginActivity();
         }
         else {
@@ -58,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
            rootRef.child("users").child(currentUID).addValueEventListener(new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                   if(!snapshot.child("username").exists()){
+                   if(!snapshot.child("username").exists()){               // user logged in but didn't add *username yet.
                        sendUserToSettingsActivity();
                    }
                }
@@ -93,8 +103,57 @@ public class MainActivity extends AppCompatActivity {
                 firebaseAuth.signOut();
                 sendUserToLoginActivity();
                 break;
+            case R.id.main_create_group:
+                requestNewGroupCreation();
         }
         return true;
+    }
+
+    private void requestNewGroupCreation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
+        builder.setTitle("Set Group Name: ");
+        final EditText groupNameField = new EditText(MainActivity.this);
+        groupNameField.setHint("e.g University ...");
+        builder.setView(groupNameField);
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String groupName = groupNameField.getText().toString();
+                if(TextUtils.isEmpty(groupName)) {
+                    Toast.makeText(MainActivity.this, "Group Name can't be Empty!", Toast.LENGTH_SHORT).show();
+                } else {
+                    createNewGroup(groupName);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void createNewGroup(final String groupName) {
+        DatabaseReference groupRef = rootRef.child("groups").push();
+        Map<String, Object> groupMap = new HashMap<>();
+        groupMap.put("admin", firebaseAuth.getUid());
+        groupMap.put("name", groupName);
+        groupMap.put("groupUsers", firebaseAuth.getUid());
+        groupRef.updateChildren(groupMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, groupName+" is created.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // adding group to the user groups list.
+        String groupId = groupRef.getKey();
+        rootRef.child("users").child(firebaseAuth.getUid()).child("groups").child(groupId).setValue("");
     }
 
     private void sendUserToLoginActivity() {
