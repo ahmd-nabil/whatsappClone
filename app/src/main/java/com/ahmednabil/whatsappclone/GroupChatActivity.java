@@ -1,9 +1,11 @@
 package com.ahmednabil.whatsappclone;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -17,15 +19,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+
 import java.util.Map;
 
 public class GroupChatActivity extends AppCompatActivity {
@@ -93,6 +98,37 @@ public class GroupChatActivity extends AppCompatActivity {
         sendButton.setEnabled(false);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        groupMessagesRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if(snapshot.exists()) new DisplayMessage(messageDisplay).execute(snapshot);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if(snapshot.exists()) new DisplayMessage(messageDisplay).execute(snapshot);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     private void initializeViews() {
         mToolBar = findViewById(R.id.group_chat_bar_layout);
@@ -142,5 +178,56 @@ public class GroupChatActivity extends AppCompatActivity {
 
         newMessageRef.updateChildren(messageData);
         messageEditText.setText(null);
+    }
+
+    public class DisplayMessage extends AsyncTask<DataSnapshot, Void, String> {
+        private String messageDate;
+        private String messageTime;
+        private String message;
+        private String senderId;
+        private String senderName;
+        private WeakReference<TextView> mMessageDisplay;
+
+        public DisplayMessage(TextView messageDisplay) {
+            mMessageDisplay = new WeakReference<>(messageDisplay);
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(DataSnapshot... snapshots) {
+            messageDate = snapshots[0].child("date").getValue().toString();
+            messageTime = snapshots[0].child("time").getValue().toString();
+            message = snapshots[0].child("message").getValue().toString();
+            senderId = snapshots[0].child("sender").getValue().toString();
+            usersRef.child(senderId).child("username").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    senderName = snapshot.getValue().toString();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+            while(senderName == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return senderName + " :\n" + message + "\n" + messageDate + "\t" + messageTime + "\n\n\n";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            mMessageDisplay.get().append(s);
+        }
     }
 }

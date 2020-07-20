@@ -9,7 +9,7 @@
     </item>
     <item
         android:id="@+id/main_create_group"
-        android:title="Create Group"
+        android:title="New Group"
         app:showAsAction="never"
         >
     </item>
