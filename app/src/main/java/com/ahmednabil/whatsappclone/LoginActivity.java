@@ -57,6 +57,14 @@ public class LoginActivity extends AppCompatActivity {
                 loginUserWithEmailAndPassword();
             }
         });
+
+        login_using_phone_number_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent phoneLoginIntent = new Intent(LoginActivity.this, PhoneLoginActivity.class);
+                startActivity(phoneLoginIntent);
+            }
+        });
     }
 
 

@@ -158,7 +158,7 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
-        Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
         String msg = messageEditText.getText().toString(); // don't have to check if empty >> i made button clickable false until there's text in messageEditText.
 
         Calendar calendar = Calendar.getInstance();
@@ -228,6 +228,7 @@ public class GroupChatActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mMessageDisplay.get().append(s);
+            mScrollView.fullScroll(View.FOCUS_DOWN);
         }
     }
 }
